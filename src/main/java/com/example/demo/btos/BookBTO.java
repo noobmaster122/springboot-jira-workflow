@@ -13,8 +13,7 @@ public class BookBTO {
 	private Date datePublication;
 	private Integer stock;
 	
-	public String getTitle() {
-		System.out.println("am returning title");
-		return this.title;
+	public void broadcastInfo() {
+		System.out.println("any time a book is added, all users should receive a notification informing them that a new book has dropped...");
 	}
 }

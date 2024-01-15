@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.btos.BookBTO;
 import com.example.demo.dtos.BookDTO;
 import com.example.demo.entities.Book;
+import com.example.demo.interfaces.BookBtoDtoMapper;
+import com.example.demo.interfaces.BookBtoEntityMapper;
 import com.example.demo.interfaces.BookDtoEntityMapper;
 import com.example.demo.services.BookService;
 
@@ -19,7 +22,11 @@ import com.example.demo.services.BookService;
 public class BooksController {
 
 	@Autowired
-	BookDtoEntityMapper BookDtoEntityMapperObj;
+	BookDtoEntityMapper bookDtoEntityMapperObj;
+	@Autowired
+	BookBtoDtoMapper bookBtoDtoMapperObj;
+	@Autowired
+	BookBtoEntityMapper bookBtoEntityManager;
 
 	@Autowired
 	BookService bookService;
@@ -29,17 +36,18 @@ public class BooksController {
 		return "home";
 	}
 
-    @PostMapping("/add-book")
-    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
-        Book bookToAdd = BookDtoEntityMapperObj.toEntity(bookDTO);
-        Book savedBook = bookService.addBook(bookToAdd);
+	@PostMapping("/save-book")
+	public ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO) {
+		BookBTO bookToAdd = bookBtoDtoMapperObj.toBto(bookDTO);
 
-        if (savedBook != null) {
-            BookDTO savedBookDTO = BookDtoEntityMapperObj.toDto(savedBook);
-            return new ResponseEntity<>(savedBookDTO, HttpStatus.CREATED);
-        }
+		BookBTO savedBook = bookService.saveBook(bookToAdd);
 
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+		if (savedBook != null) {
+			BookDTO savedBookDTO = bookBtoDtoMapperObj.toDto(savedBook);
+			return new ResponseEntity<>(savedBookDTO, HttpStatus.CREATED);
+		}
+
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
