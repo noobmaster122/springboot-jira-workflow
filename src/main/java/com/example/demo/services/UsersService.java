@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.btos.UserBTO;
 import com.example.demo.dtos.BookDTO;
 import com.example.demo.dtos.UserDTO;
 import com.example.demo.entities.User;
+import com.example.demo.interfaces.UserBtoEntityMapper;
 import com.example.demo.interfaces.UserDtoEntityMapper;
 import com.example.demo.repositories.UserRepository;
 
@@ -22,16 +24,16 @@ public class UsersService {
 	@Autowired
 	UserDtoEntityMapper UserDtoEntityMapperObj;
 	@Autowired
+	UserBtoEntityMapper userBtoEntMapperObj;
+	@Autowired
 	UserRepository userRepo;
 	
 	
-	public UserDTO saveUser(UserDTO userDto) {
+	public UserBTO saveUser(UserBTO userBto) {
 		
-		User user = UserDtoEntityMapperObj.toEntity(userDto);
-		long millis = System.currentTimeMillis();
-		user.setDateInscription(new Timestamp(millis));
+		User user = userBtoEntMapperObj.toEntity(userBto);
 		
-		return UserDtoEntityMapperObj.toDto(userRepo.save(user));
+		return userBtoEntMapperObj.toBto(userRepo.save(user));
 	}
 	
 	public List<UserDTO> getAllUsers() {

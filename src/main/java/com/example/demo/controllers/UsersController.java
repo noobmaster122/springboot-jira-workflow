@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.btos.BookBTO;
+import com.example.demo.btos.UserBTO;
 import com.example.demo.dtos.BookDTO;
 import com.example.demo.dtos.UserDTO;
+import com.example.demo.interfaces.UserDtoBtoMapper;
 import com.example.demo.services.UsersService;
 
 
@@ -27,16 +29,19 @@ public class UsersController {
 	
 	@Autowired
 	UsersService usersService; 
+	@Autowired
+	UserDtoBtoMapper userDtoBtoMapperObj;
 	
 	
 	@PostMapping("/save-user")
 	public ResponseEntity<?> saveBook(@RequestBody UserDTO userDTO) {
 		try {
 
-			UserDTO newUser = usersService.saveUser(userDTO);
+			UserBTO userBto = userDtoBtoMapperObj.toBto(userDTO);
+			UserBTO newUser = usersService.saveUser(userBto);
 
 			if (newUser != null) {
-				return new ResponseEntity<UserDTO>(newUser, HttpStatus.CREATED);
+				return new ResponseEntity<UserDTO>(userDtoBtoMapperObj.toDto(newUser), HttpStatus.CREATED);
 			}
 
 			return new ResponseEntity<String>("Error while saving the user", HttpStatus.INTERNAL_SERVER_ERROR);
