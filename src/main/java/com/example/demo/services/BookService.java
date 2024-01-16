@@ -3,6 +3,7 @@ package com.example.demo.services;
 import java.sql.Date;
 import java.time.LocalTime; // import the LocalTime class
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,18 @@ public class BookService {
 
 	public List<Book> getAllBooks() {
         return bookRepo.findAll();
+	}
+	
+
+	public boolean deleteBookByIsbn(String isbn) {
+        Optional<Book> optionalBook = Optional.ofNullable(bookRepo.findByIsbn(isbn));
+
+        if (optionalBook.isPresent()) {
+        	bookRepo.delete(optionalBook.get());
+            return true;
+        } else {
+            return false; // Book not found
+        }
 	}
 	
 	public BookBTO saveBook(BookBTO book) {

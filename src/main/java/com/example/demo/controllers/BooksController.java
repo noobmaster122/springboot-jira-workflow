@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,54 +35,79 @@ public class BooksController {
 	@Autowired
 	BookService bookService;
 
-	@GetMapping("/")
-	public String home() {
-		return "home";
+	@DeleteMapping("/delete-book/{isbn}")
+	public ResponseEntity<String> deleteBook(@PathVariable String isbn) {
+		try {
+			boolean deleted = bookService.deleteBookByIsbn(isbn);
+
+			if (deleted) {
+				return new ResponseEntity<>("Book deleted successfully.", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>("Book not found.", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			// Log the exception
+			return new ResponseEntity<>("Error deleting the book.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
-	
+
 	@GetMapping("/get-books")
-	public ResponseEntity<List<BookDTO>> getBooks() {
-        List<Book> allBooks = bookService.getAllBooks();
+	public ResponseEntity<?> getBooks() {
+		try {
+			List<Book> allBooks = bookService.getAllBooks();
 
-        if (!allBooks.isEmpty()) {
-            List<BookDTO> allBooksDTO = allBooks.stream()
-                    .map(bookDtoEntityMapperObj::toDto)
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(allBooksDTO, HttpStatus.OK);
-        }
+			if (!allBooks.isEmpty()) {
+				List<BookDTO> allBooksDTO = allBooks.stream().map(bookDtoEntityMapperObj::toDto)
+						.collect(Collectors.toList());
+				return new ResponseEntity<List<BookDTO>>(allBooksDTO, HttpStatus.OK);
+			}
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<String>("No books found.", HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			// Log the exception
+			return new ResponseEntity<String>("Error while trying to get books.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PostMapping("/save-book")
-	public ResponseEntity<BookDTO> saveBook(@RequestBody BookDTO bookDTO) {
-		BookBTO bookToAdd = bookBtoDtoMapperObj.toBto(bookDTO);
+	public ResponseEntity<?> saveBook(@RequestBody BookDTO bookDTO) {
+		try {
+			BookBTO bookToAdd = bookBtoDtoMapperObj.toBto(bookDTO);
 
-		BookBTO savedBook = bookService.saveBook(bookToAdd);
+			BookBTO savedBook = bookService.saveBook(bookToAdd);
 
-		if (savedBook != null) {
-			BookDTO savedBookDTO = bookBtoDtoMapperObj.toDto(savedBook);
-			return new ResponseEntity<>(savedBookDTO, HttpStatus.CREATED);
+			if (savedBook != null) {
+				BookDTO savedBookDTO = bookBtoDtoMapperObj.toDto(savedBook);
+				return new ResponseEntity<BookDTO>(savedBookDTO, HttpStatus.CREATED);
+			}
+
+			return new ResponseEntity<String>("Error while saving the book", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			// Log the exception
+			return new ResponseEntity<>("Server error while saving the book", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 	@PostMapping("/update-book/{isbn}")
-	public ResponseEntity<BookDTO> updateBook(@PathVariable String isbn,@RequestBody BookDTO updatedBookDTO) {
-		
-		BookBTO bookToAdd = bookBtoDtoMapperObj.toBto(updatedBookDTO);
+	public ResponseEntity<?> updateBook(@PathVariable String isbn, @RequestBody BookDTO updatedBookDTO) {
 
-		BookBTO updatedBookBTO = bookService.updateBook(isbn, bookToAdd);
+		try {
+			BookBTO bookToAdd = bookBtoDtoMapperObj.toBto(updatedBookDTO);
 
-        if (updatedBookBTO != null) {
-            // Convert the updated book to DTO and return it
-            BookDTO bookToReturnDTO = bookBtoDtoMapperObj.toDto(updatedBookBTO);
-            return ResponseEntity.ok(bookToReturnDTO);
-        } else {
-            // Book with the given ISBN not found
-            return ResponseEntity.notFound().build();
-        }
+			BookBTO updatedBookBTO = bookService.updateBook(isbn, bookToAdd);
+
+			if (updatedBookBTO != null) {
+				// Convert the updated book to DTO and return it
+				BookDTO bookToReturnDTO = bookBtoDtoMapperObj.toDto(updatedBookBTO);
+				return new ResponseEntity<BookDTO>(bookToReturnDTO, HttpStatus.OK);
+			} else {
+				// Book with the given ISBN not found
+				return new ResponseEntity<String>("Book not found", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			// Log the exception
+			return new ResponseEntity<String>("Server error while modifying the book data", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }
