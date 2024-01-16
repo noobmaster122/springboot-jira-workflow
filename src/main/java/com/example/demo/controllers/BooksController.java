@@ -1,5 +1,8 @@
 package com.example.demo.controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,20 @@ public class BooksController {
 	@GetMapping("/")
 	public String home() {
 		return "home";
+	}
+	
+	@GetMapping("/get-books")
+	public ResponseEntity<List<BookDTO>> getBooks() {
+        List<Book> allBooks = bookService.getAllBooks();
+
+        if (!allBooks.isEmpty()) {
+            List<BookDTO> allBooksDTO = allBooks.stream()
+                    .map(bookDtoEntityMapperObj::toDto)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(allBooksDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@PostMapping("/save-book")

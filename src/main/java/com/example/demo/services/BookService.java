@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import java.sql.Date;
 import java.time.LocalTime; // import the LocalTime class
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,11 @@ public class BookService {
 	@Autowired
 	BookBtoEntityMapper bookBtoEntityMapper;
 
+
+	public List<Book> getAllBooks() {
+        return bookRepo.findAll();
+	}
+	
 	public BookBTO saveBook(BookBTO book) {
 		Book bookEnt = bookBtoEntityMapper.toEntity(book);
 		long millis = System.currentTimeMillis();
