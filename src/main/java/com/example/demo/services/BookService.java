@@ -27,4 +27,24 @@ public class BookService {
 		dataToReturn.broadcastInfo();
 		return dataToReturn;
 	}
+	
+	public BookBTO updateBook(String isbn, BookBTO updatedBook) {
+		
+        // Check if the book with the given ISBN exists
+        Book existingBook = bookRepo.findByIsbn(isbn);
+
+        if (existingBook != null) {
+        	
+        	//update title and stock if changed
+        	if(updatedBook.getTitle() != null) existingBook.setTitle(updatedBook.getTitle());
+        	if(updatedBook.getStock() != null) existingBook.setStock(updatedBook.getStock());
+
+            // Save the updated book
+            Book savedBook = bookRepo.save(existingBook);
+            // Convert the saved book back to BTO and return it
+            return bookBtoEntityMapper.toBto(savedBook);
+        }else {
+        	return null;
+        }
+	}
 }

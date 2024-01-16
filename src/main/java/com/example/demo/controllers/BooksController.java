@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +49,23 @@ public class BooksController {
 		}
 
 		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping("/update-book/{isbn}")
+	public ResponseEntity<BookDTO> updateBook(@PathVariable String isbn,@RequestBody BookDTO updatedBookDTO) {
+		
+		BookBTO bookToAdd = bookBtoDtoMapperObj.toBto(updatedBookDTO);
+
+		BookBTO updatedBookBTO = bookService.updateBook(isbn, bookToAdd);
+
+        if (updatedBookBTO != null) {
+            // Convert the updated book to DTO and return it
+            BookDTO bookToReturnDTO = bookBtoDtoMapperObj.toDto(updatedBookBTO);
+            return ResponseEntity.ok(bookToReturnDTO);
+        } else {
+            // Book with the given ISBN not found
+            return ResponseEntity.notFound().build();
+        }
 	}
 
 }
