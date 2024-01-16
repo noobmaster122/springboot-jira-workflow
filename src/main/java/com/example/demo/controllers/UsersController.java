@@ -89,4 +89,19 @@ public class UsersController {
 			return new ResponseEntity<>("Server error while saving the user", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	@DeleteMapping("/delete-user/{userName}")
+	public ResponseEntity<String> deleteBook(@PathVariable String userName) {
+		try {
+			boolean deleted = usersService.deleteBookByUserName(userName);
+
+			if (deleted) {
+				return new ResponseEntity<>("User deleted successfully.", HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			// Log the exception
+			return new ResponseEntity<>("Error deleting the User.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

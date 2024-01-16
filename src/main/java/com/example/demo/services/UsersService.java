@@ -3,6 +3,7 @@ package com.example.demo.services;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,17 @@ public class UsersService {
 		List<User> usersList = userRepo.findAll();
 		return usersList.stream().map(UserDtoEntityMapperObj::toDto)
 				.collect(Collectors.toList());
+	}
+	
+	public boolean deleteBookByUserName(String userName) {
+        Optional<User> optionalUser = Optional.ofNullable(userRepo.findByUserName(userName));
+
+        if (optionalUser.isPresent()) {
+        	userRepo.delete(optionalUser.get());
+            return true;
+        } else {
+            return false; // user not found
+        }
 	}
 
 }
