@@ -3,11 +3,13 @@ package com.example.demo.entities;
 
 import jakarta.persistence.Table;
 
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
+import java.sql.Date;
 
 import jakarta.persistence.Column;
 
@@ -29,6 +31,10 @@ public class User {
     private String password;
 	@Column(name="email", unique = true, nullable = false, length = 255)
     private String email;
+    @Column(name = "password_update_timestamp")
+    private Date passwordUpdateTimestamp;
+    @Column(name = "last_conn_timestamp")
+    private Date lastConnTimestamp;
     @Column(name = "date_inscription", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp dateInscription;
 	
