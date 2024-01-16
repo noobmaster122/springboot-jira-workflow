@@ -25,16 +25,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
     private Integer id;
-	@Column(name="user_name", nullable = false, length = 100)
+	@Column(name="user_name", unique = true, nullable = false, length = 100)
     private String userName;
 	@Column(name="password", nullable = false, length = 255)
     private String password;
 	@Column(name="email", unique = true, nullable = false, length = 255)
     private String email;
     @Column(name = "password_update_timestamp")
-    private Date passwordUpdateTimestamp;
+    private Timestamp passwordUpdateTimestamp;
     @Column(name = "last_conn_timestamp")
-    private Date lastConnTimestamp;
+    private Timestamp lastConnTimestamp;
     @Column(name = "date_inscription", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp dateInscription;
 	

@@ -22,6 +22,8 @@ import com.example.demo.dtos.UserDTO;
 import com.example.demo.interfaces.UserDtoBtoMapper;
 import com.example.demo.services.UsersService;
 
+import jakarta.websocket.server.PathParam;
+
 
 
 @RestController
@@ -45,6 +47,27 @@ public class UsersController {
 			}
 
 			return new ResponseEntity<String>("Error while saving the user", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			// Log the exception
+			return new ResponseEntity<>("Server error while saving the user", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@PostMapping("/update-user/{userName}")
+	public ResponseEntity<?> saveBook(@PathVariable String userName, @RequestBody UserDTO userDTO) {
+		try {
+			
+			UserBTO userBto = userDtoBtoMapperObj.toBto(userDTO);
+
+			UserBTO updatedUserBto = usersService.updateUser(userName, userBto);
+
+			if (updatedUserBto != null) {
+				// Convert the updated user to DTO and return it
+				UserDTO updatedUserDto = userDtoBtoMapperObj.toDto(updatedUserBto);
+				return new ResponseEntity<UserDTO>(updatedUserDto, HttpStatus.OK);
+			} else {
+				// Book with the given ISBN not found
+				return new ResponseEntity<String>("user not found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
 			// Log the exception
 			return new ResponseEntity<>("Server error while saving the user", HttpStatus.INTERNAL_SERVER_ERROR);
